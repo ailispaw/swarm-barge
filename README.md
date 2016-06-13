@@ -3,7 +3,7 @@
 https://github.com/docker/swarmkit
 > SwarmKit is a toolkit for orchestrating distributed systems at any scale. It includes primitives for node discovery, raft-based consensus, task scheduling and more.
 
-This shows how to create a SwarmKit cluster on [Barge](https://atlas.hashicorp.com/ailispaw/boxes/barge) with [Vagrant](https://www.vagrantup.com/) instantly.
+This shows how to create a Docker Swarm cluster on [Barge](https://atlas.hashicorp.com/ailispaw/boxes/barge) with [SwarmKit](https://github.com/docker/swarmkit) and [Vagrant](https://www.vagrantup.com/) instantly.
 
 It's inspired by
 - [First Look at Docker SwarmKit | Replicated Blog](https://blog.replicated.com/2016/06/08/first-look-at-swarmkit/)
