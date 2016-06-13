@@ -15,7 +15,7 @@ Please read them for further details.
 
 - [VirtualBox](https://www.virtualbox.org/)
 - [Vagrant](https://www.vagrantup.com/)
-- [vagrant-triggers](https://github.com/emyl/vagrant-triggers)
+- [vagrant-triggers](https://github.com/emyl/vagrant-triggers) (optional)  
   It will `git clone https://github.com/docker/swarmkit.git` on `vagrant up` automatically.
 
 ## Boot up
