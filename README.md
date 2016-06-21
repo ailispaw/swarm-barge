@@ -23,27 +23,28 @@ That's it.
 
 ```bash
 $ vagrant ssh
+Welcome to Barge 2.1.2, Docker version 1.12.0-rc2, build 906eacd
 [bargee@node-01 ~]$ docker node ls
 ID                           NAME     MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
-318oexxpzl38dbgauj4ip8f16    node-02  Accepted    Ready   Active
-43kteyorgncwthoi5zn3dyt3q    node-03  Accepted    Ready   Active
-dxrf0lrd3ed7hhv77nrkjruw0 *  node-01  Accepted    Ready   Active        Leader
+0kfhm60hjn9jekz5oyz9h7k9q    node-02  Accepted    Ready   Active
+6lmenrr5upb4g0lh2xo2af3ge    node-03  Accepted    Ready   Active
+86tqrcxwnquoaoqet5j2ba2mn *  node-01  Accepted    Ready   Active        Leader
 ```
 
 ### Create a service
 
 ```bash
 [bargee@node-01 ~]$ docker service create --name redis redis:3.0.5
-9zyzpbinl1k9uxp7h7m9lb434
-[bargee@node-01 ~]$ docker service ls
-ID            NAME   REPLICAS  IMAGE        COMMAND
-9zyzpbinl1k9  redis  0/1       redis:3.0.5
+7kqyo9dc0prjatf1mv6uwekgr
 [bargee@node-01 ~]$ docker service tasks redis
-ID                         NAME     SERVICE  IMAGE        LAST STATE          DESIRED STATE  NODE
-c31w8247nc09y6nfai8hp0xal  redis.1  redis    redis:3.0.5  Running 59 seconds  Running        node-01
+ID                         NAME     SERVICE  IMAGE        LAST STATE           DESIRED STATE  NODE
+cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Preparing 9 seconds  Running        node-01
+[bargee@node-01 ~]$ docker service tasks redis
+ID                         NAME     SERVICE  IMAGE        LAST STATE              DESIRED STATE  NODE
+cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Running About a minute  Running        node-01
 [bargee@node-01 ~]$ docker ps -a
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
-98ed65c3640b        redis:3.0.5         "/entrypoint.sh redis"   38 seconds ago      Up 37 seconds       6379/tcp            redis.1.c31w8247nc09y6nfai8hp0xal
+12e79bfb525f        redis:3.0.5         "/entrypoint.sh redis"   15 seconds ago      Up 14 seconds       6379/tcp            redis.1.cka3zmfkskbhz8lgmgo52x6kg
 ```
 
 ## Update the service
@@ -52,10 +53,15 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 [bargee@node-01 ~]$ docker service update --replicas=3 redis
 redis
 [bargee@node-01 ~]$ docker service tasks redis
-ID                         NAME     SERVICE  IMAGE        LAST STATE            DESIRED STATE  NODE
-c31w8247nc09y6nfai8hp0xal  redis.1  redis    redis:3.0.5  Running 4 minutes     Running        node-01
-1lg58ghbj36iyy2915w0e3mp5  redis.2  redis    redis:3.0.5  Preparing 13 seconds  Running        node-03
-3m8oridvds3rjwxcwz4aivgdk  redis.3  redis    redis:3.0.5  Preparing 13 seconds  Running        node-02
+ID                         NAME     SERVICE  IMAGE        LAST STATE              DESIRED STATE  NODE
+cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Running About a minute  Running        node-01
+ey3pzccxqoai9riwkbz3duuq0  redis.2  redis    redis:3.0.5  Preparing 4 seconds     Running        node-03
+egjdih78si559rqllyx1m4gjm  redis.3  redis    redis:3.0.5  Preparing 4 seconds     Running        node-02
+[bargee@node-01 ~]$ docker service tasks redis
+ID                         NAME     SERVICE  IMAGE        LAST STATE         DESIRED STATE  NODE
+cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Running 3 minutes  Running        node-01
+ey3pzccxqoai9riwkbz3duuq0  redis.2  redis    redis:3.0.5  Running 2 minutes  Running        node-03
+egjdih78si559rqllyx1m4gjm  redis.3  redis    redis:3.0.5  Running 2 minutes  Running        node-02
 ```
 
 ## Drain a node
@@ -65,14 +71,14 @@ c31w8247nc09y6nfai8hp0xal  redis.1  redis    redis:3.0.5  Running 4 minutes     
 node-03
 [bargee@node-01 ~]$ docker node ls
 ID                           NAME     MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
-318oexxpzl38dbgauj4ip8f16    node-02  Accepted    Ready   Active
-43kteyorgncwthoi5zn3dyt3q    node-03  Accepted    Ready   Drain
-dxrf0lrd3ed7hhv77nrkjruw0 *  node-01  Accepted    Ready   Active        Leader
+0kfhm60hjn9jekz5oyz9h7k9q    node-02  Accepted    Ready   Active
+6lmenrr5upb4g0lh2xo2af3ge    node-03  Accepted    Ready   Drain
+86tqrcxwnquoaoqet5j2ba2mn *  node-01  Accepted    Ready   Active        Leader
 [bargee@node-01 ~]$ docker service tasks redis
 ID                         NAME     SERVICE  IMAGE        LAST STATE          DESIRED STATE  NODE
-c31w8247nc09y6nfai8hp0xal  redis.1  redis    redis:3.0.5  Running 8 minutes   Running        node-01
-dpj8u02dkeytm0x3dgtgcuf8e  redis.2  redis    redis:3.0.5  Running 26 seconds  Running        node-02
-3m8oridvds3rjwxcwz4aivgdk  redis.3  redis    redis:3.0.5  Running 3 minutes   Running        node-02
+cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Running 4 minutes   Running        node-01
+dmjv0n4n2dceex1mldw1o12r6  redis.2  redis    redis:3.0.5  Running 17 seconds  Running        node-02
+egjdih78si559rqllyx1m4gjm  redis.3  redis    redis:3.0.5  Running 2 minutes   Running        node-02
 ```
 
 ## Remove the service
