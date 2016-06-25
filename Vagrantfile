@@ -13,12 +13,10 @@ BASE_IP_ADDR = "192.168.65"
 
 Vagrant.configure(2) do |config|
   config.vm.box = "ailispaw/barge"
+  config.vm.box_version = ">= 2.1.3"
 
   config.vm.provision :shell do |sh|
     sh.inline = <<-EOT
-      wget -q https://raw.githubusercontent.com/bargees/barge-os/docker-1.12/overlay/etc/init.d/docker
-      chmod +x docker
-      mv docker /etc/init.d/docker
       /etc/init.d/docker restart v1.12.0-rc2
     EOT
   end

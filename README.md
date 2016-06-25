@@ -23,7 +23,7 @@ That's it.
 
 ```bash
 $ vagrant ssh
-Welcome to Barge 2.1.2, Docker version 1.12.0-rc2, build 906eacd
+Welcome to Barge 2.1.3, Docker version 1.12.0-rc2, build 906eacd
 [bargee@node-01 ~]$ docker node ls
 ID                           NAME     MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
 0kfhm60hjn9jekz5oyz9h7k9q    node-02  Accepted    Ready   Active
