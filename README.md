@@ -50,8 +50,8 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 ## Update the service
 
 ```bash
-[bargee@node-01 ~]$ docker service update --replicas=3 redis
-redis
+[bargee@node-01 ~]$ docker service scale redis=3
+redis scaled to 3
 [bargee@node-01 ~]$ docker service tasks redis
 ID                         NAME     SERVICE  IMAGE        LAST STATE              DESIRED STATE  NODE
 cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Running About a minute  Running        node-01
