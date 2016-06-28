@@ -13,7 +13,7 @@ BASE_IP_ADDR = "192.168.65"
 
 Vagrant.configure(2) do |config|
   config.vm.box = "ailispaw/barge"
-  config.vm.box_version = ">= 2.1.3"
+  config.vm.box_version = ">= 2.1.4"
 
   config.vm.provision :shell do |sh|
     sh.inline = <<-EOT
@@ -28,7 +28,7 @@ Vagrant.configure(2) do |config|
 
     node.vm.provision :shell do |sh|
       sh.inline = <<-EOT
-        docker swarm init
+        docker swarm init --listen-addr "#{BASE_IP_ADDR}.101:2377"
       EOT
     end
   end
