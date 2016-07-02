@@ -25,69 +25,102 @@ That's it.
 $ vagrant ssh
 Welcome to Barge 2.1.5, Docker version 1.12.0-rc3, build 91e29e8
 [bargee@node-01 ~]$ docker node ls
-ID                           NAME     MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
-0kfhm60hjn9jekz5oyz9h7k9q    node-02  Accepted    Ready   Active
-6lmenrr5upb4g0lh2xo2af3ge    node-03  Accepted    Ready   Active
-86tqrcxwnquoaoqet5j2ba2mn *  node-01  Accepted    Ready   Active        Leader
+ID                           HOSTNAME  MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
+696cma420rjypkftujrpxmqs2 *  node-01   Accepted    Ready   Active        Leader
+c2zz4w65vii7g7nzj6quyi16g    node-03   Accepted    Ready   Active
+eu4th28cf2yhpyv95ywkadpjf    node-02   Accepted    Ready   Active
 ```
 
 ### Create a service
 
 ```bash
-[bargee@node-01 ~]$ docker service create --name redis redis:3.0.5
-7kqyo9dc0prjatf1mv6uwekgr
-[bargee@node-01 ~]$ docker service tasks redis
-ID                         NAME     SERVICE  IMAGE        LAST STATE           DESIRED STATE  NODE
-cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Preparing 9 seconds  Running        node-01
-[bargee@node-01 ~]$ docker service tasks redis
-ID                         NAME     SERVICE  IMAGE        LAST STATE              DESIRED STATE  NODE
-cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Running About a minute  Running        node-01
-[bargee@node-01 ~]$ docker ps -a
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
-12e79bfb525f        redis:3.0.5         "/entrypoint.sh redis"   15 seconds ago      Up 14 seconds       6379/tcp            redis.1.cka3zmfkskbhz8lgmgo52x6kg
+[bargee@node-01 ~]$ docker service create --name vote -p 8080:80 instavote/vote
+283tgaj9oq493hkeochnhyl4m
+[bargee@node-01 ~]$ docker service tasks vote
+ID                         NAME    SERVICE  IMAGE           LAST STATE          DESIRED STATE  NODE
+6wdivw267q1s0cpqbnuve6dlr  vote.1  vote     instavote/vote  Running 13 seconds  Running        node-01
+[bargee@node-01 ~]$  docker ps -a
+CONTAINER ID        IMAGE                   COMMAND                  CREATED             STATUS              PORTS               NAMES
+c35944b92124        instavote/vote:latest   "gunicorn app:app -b "   22 seconds ago      Up 21 seconds       80/tcp              vote.1.6wdivw267q1s0cpqbnuve6dlr
 ```
+
+```bash
+$ open http://192.168.65.101:8080/
+```
+
+![Cats vs Dogs!](https://65.media.tumblr.com/7219623b72287a3f2593c7c279cb8c41/tumblr_o9p000HMuk1u7n3kzo1_1280.png)
 
 ## Update the service
 
 ```bash
-[bargee@node-01 ~]$ docker service scale redis=3
-redis scaled to 3
-[bargee@node-01 ~]$ docker service tasks redis
-ID                         NAME     SERVICE  IMAGE        LAST STATE              DESIRED STATE  NODE
-cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Running About a minute  Running        node-01
-ey3pzccxqoai9riwkbz3duuq0  redis.2  redis    redis:3.0.5  Preparing 4 seconds     Running        node-03
-egjdih78si559rqllyx1m4gjm  redis.3  redis    redis:3.0.5  Preparing 4 seconds     Running        node-02
-[bargee@node-01 ~]$ docker service tasks redis
-ID                         NAME     SERVICE  IMAGE        LAST STATE         DESIRED STATE  NODE
-cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Running 3 minutes  Running        node-01
-ey3pzccxqoai9riwkbz3duuq0  redis.2  redis    redis:3.0.5  Running 2 minutes  Running        node-03
-egjdih78si559rqllyx1m4gjm  redis.3  redis    redis:3.0.5  Running 2 minutes  Running        node-02
+[bargee@node-01 ~]$ docker service scale vote=3
+vote scaled to 3
+[bargee@node-01 ~]$ docker service tasks vote
+ID                         NAME    SERVICE  IMAGE           LAST STATE              DESIRED STATE  NODE
+6wdivw267q1s0cpqbnuve6dlr  vote.1  vote     instavote/vote  Running About a minute  Running        node-01
+4y0u0gsfj3hkumbov6bcjqgm0  vote.2  vote     instavote/vote  Running 11 seconds      Running        node-02
+b7sfv3oskjjt5l21seo3f7u60  vote.3  vote     instavote/vote  Running 11 seconds      Running        node-03
+```
+
+## Check load balancing
+
+```bash
+[bargee@node-01 ~]$ sudo pkg install iproute2
+[bargee@node-01 ~]$ sudo pkg install ipvsadm
+[bargee@node-01 ~]$ sudo ls -l /var/run/docker/netns
+total 0
+-r--r--r--    1 root     root             0 Jul  2 14:35 1-cju9mci9kf
+-r--r--r--    1 root     root             0 Jul  2 14:35 29891f6354a1
+-r--r--r--    1 root     root             0 Jul  2 14:41 ab8827aaaf47
+[bargee@node-01 ~]$ sudo mkdir -p /var/run/netns
+[bargee@node-01 ~]$ sudo ln -s /var/run/docker/netns/29891f6354a1 /var/run/netns/lbingress
+[bargee@node-01 ~]$ sudo ip netns exec lbingress ipvsadm -L
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -> RemoteAddress:Port           Forward Weight ActiveConn InActConn
+FWM  256 rr
+  -> 10.255.0.7:0                 Masq    1      0          0
+  -> 10.255.0.8:0                 Masq    1      0          0
+  -> 10.255.0.9:0                 Masq    1      0          0
+```
+
+```bash
+$ open http://192.168.65.101:8080/
+```
+
+You will see 3 container ID at the bottom of the page on each reloading.
+
+And the following as well.
+
+```bash
+$ open http://192.168.65.102:8080/
+$ open http://192.168.65.103:8080/
 ```
 
 ## Drain a node
 
 ```bash
-[[bargee@node-01 ~]$ docker node update --availability=drain node-03
+[bargee@node-01 ~]$ docker node update --availability=drain node-03
 node-03
 [bargee@node-01 ~]$ docker node ls
-ID                           NAME     MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
-0kfhm60hjn9jekz5oyz9h7k9q    node-02  Accepted    Ready   Active
-6lmenrr5upb4g0lh2xo2af3ge    node-03  Accepted    Ready   Drain
-86tqrcxwnquoaoqet5j2ba2mn *  node-01  Accepted    Ready   Active        Leader
-[bargee@node-01 ~]$ docker service tasks redis
-ID                         NAME     SERVICE  IMAGE        LAST STATE          DESIRED STATE  NODE
-cka3zmfkskbhz8lgmgo52x6kg  redis.1  redis    redis:3.0.5  Running 4 minutes   Running        node-01
-dmjv0n4n2dceex1mldw1o12r6  redis.2  redis    redis:3.0.5  Running 17 seconds  Running        node-02
-egjdih78si559rqllyx1m4gjm  redis.3  redis    redis:3.0.5  Running 2 minutes   Running        node-02
+ID                           HOSTNAME  MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
+696cma420rjypkftujrpxmqs2 *  node-01   Accepted    Ready   Active        Leader
+c2zz4w65vii7g7nzj6quyi16g    node-03   Accepted    Ready   Drain
+eu4th28cf2yhpyv95ywkadpjf    node-02   Accepted    Ready   Active
+[bargee@node-01 ~]$ docker service tasks vote
+ID                         NAME    SERVICE  IMAGE           LAST STATE          DESIRED STATE  NODE
+6wdivw267q1s0cpqbnuve6dlr  vote.1  vote     instavote/vote  Running 15 minutes  Running        node-01
+4y0u0gsfj3hkumbov6bcjqgm0  vote.2  vote     instavote/vote  Running 14 minutes  Running        node-02
+ao5f31wriza473kz6ypt24l0h  vote.3  vote     instavote/vote  Running 25 seconds  Running        node-02
 ```
 
 ## Remove the service
 
 ```bash
-[bargee@node-01 ~]$ docker service rm redis
-redis
+[bargee@node-01 ~]$ docker service rm vote
+vote
 [bargee@node-01 ~]$ docker service tasks redis
-Error: No such service: redis
+Error: No such service: vote
 [bargee@node-01 ~]$ docker service ls
 ID  NAME  REPLICAS  IMAGE  COMMAND
 [bargee@node-01 ~]$ docker ps -a
