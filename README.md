@@ -12,9 +12,9 @@ It's inspired by DockerCon16 KeyNote and "What's New in Docker" session.
 ## Boot up
 
 ```bash
-$ git clone -b docker-1.12 https://github.com/ailispaw/swarmkit-barge
+$ git clone https://github.com/ailispaw/swarmkit-barge
 $ cd swarmkit-barge
-$ vagrant up
+$ make up
 ```
 
 That's it.
@@ -22,8 +22,8 @@ That's it.
 ## Tryout
 
 ```bash
-$ vagrant ssh
-Welcome to Barge 2.1.5, Docker version 1.12.0-rc3, build 91e29e8
+$ ssh -F .ssh_config node-01
+Welcome to Barge 2.1.8, Docker version 1.12.0-rc5, build a3f2063
 [bargee@node-01 ~]$ docker node ls
 ID                           HOSTNAME  MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
 696cma420rjypkftujrpxmqs2 *  node-01   Accepted    Ready   Active        Leader
