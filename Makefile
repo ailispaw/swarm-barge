@@ -1,7 +1,6 @@
 NODES := node-01 node-02 node-03
 
-SSH_CONFIG   := .ssh_config
-SWARM_CONFIG := .swarm_config
+SSH_CONFIG := .ssh_config
 
 GET_IP  := ifconfig eth1 | awk '/inet addr/{print substr(\\$$2,6)}'
 NODE_IP := `ssh -F $(SSH_CONFIG) node "$(GET_IP)"`
@@ -12,7 +11,7 @@ node-01:
 	vagrant up $@
 	vagrant ssh-config $@ > $(SSH_CONFIG)
 
-	ssh -F $(SSH_CONFIG) $@ /opt/bin/docker swarm init --advertise-addr "$(NODE_IP:node=$@):2377" | tee $(SWARM_CONFIG)
+	ssh -F $(SSH_CONFIG) $@ /opt/bin/docker swarm init --advertise-addr "$(NODE_IP:node=$@):2377"
 
 node-02 node-03:
 	vagrant up $@
@@ -20,7 +19,7 @@ node-02 node-03:
 		vagrant ssh-config $@ >> $(SSH_CONFIG); \
 	fi
 
-	$(eval TOKEN=$$(shell awk '/--token/{print $$$$2;exit;}' $(SWARM_CONFIG)))
+	$(eval TOKEN=$$(shell ssh -F $(SSH_CONFIG) node-01 /opt/bin/docker swarm join-token worker | awk '/--token/{print $$$$2}'))
 
 	ssh -F $(SSH_CONFIG) $@ /opt/bin/docker swarm join --token "$(TOKEN)" "$(NODE_IP:node=node-01):2377"
 
@@ -30,6 +29,6 @@ status:
 clean:
 	vagrant destroy -f
 	$(RM) -r .vagrant
-	$(RM) $(SSH_CONFIG) $(SWARM_CONFIG)
+	$(RM) $(SSH_CONFIG)
 
 .PHONY: up $(NODES) status clean
