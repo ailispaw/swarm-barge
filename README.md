@@ -25,23 +25,23 @@ That's it.
 $ ssh -F .ssh_config node-01
 Welcome to Barge 2.1.8, Docker version 1.12.0-rc5, build a3f2063
 [bargee@node-01 ~]$ docker node ls
-ID                           HOSTNAME  MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
-696cma420rjypkftujrpxmqs2 *  node-01   Accepted    Ready   Active        Leader
-c2zz4w65vii7g7nzj6quyi16g    node-03   Accepted    Ready   Active
-eu4th28cf2yhpyv95ywkadpjf    node-02   Accepted    Ready   Active
+ID                           HOSTNAME  STATUS  AVAILABILITY  MANAGER STATUS
+6qn4jov5n61v23beh0lqtngbl    node-03   Ready   Active
+8g88v2jyf49lmwbnfxfsoofp5 *  node-01   Ready   Active        Leader
+c84jsskhloiuwkf3tk35qrc7a    node-02   Ready   Active
 ```
 
 ### Create a service
 
 ```bash
 [bargee@node-01 ~]$ docker service create --name vote -p 8080:80 instavote/vote
-283tgaj9oq493hkeochnhyl4m
+cf9rqqsg8emvx2x70ifxa8jbt
 [bargee@node-01 ~]$ docker service tasks vote
-ID                         NAME    SERVICE  IMAGE           LAST STATE          DESIRED STATE  NODE
-6wdivw267q1s0cpqbnuve6dlr  vote.1  vote     instavote/vote  Running 13 seconds  Running        node-01
+ID                         NAME    IMAGE           NODE     DESIRED STATE  CURRENT STATE          ERROR
+1b5ebv79wqthx2wb8rsuu2srb  vote.1  instavote/vote  node-01  Running        Running 1 seconds ago
 [bargee@node-01 ~]$  docker ps -a
 CONTAINER ID        IMAGE                   COMMAND                  CREATED             STATUS              PORTS               NAMES
-c35944b92124        instavote/vote:latest   "gunicorn app:app -b "   22 seconds ago      Up 21 seconds       80/tcp              vote.1.6wdivw267q1s0cpqbnuve6dlr
+3df56eac0537        instavote/vote:latest   "gunicorn app:app -b "   17 seconds ago      Up 17 seconds       80/tcp              vote.1.1b5ebv79wqthx2wb8rsuu2srb
 ```
 
 ```bash
@@ -56,10 +56,10 @@ $ open http://192.168.65.101:8080/
 [bargee@node-01 ~]$ docker service scale vote=3
 vote scaled to 3
 [bargee@node-01 ~]$ docker service tasks vote
-ID                         NAME    SERVICE  IMAGE           LAST STATE              DESIRED STATE  NODE
-6wdivw267q1s0cpqbnuve6dlr  vote.1  vote     instavote/vote  Running About a minute  Running        node-01
-4y0u0gsfj3hkumbov6bcjqgm0  vote.2  vote     instavote/vote  Running 11 seconds      Running        node-02
-b7sfv3oskjjt5l21seo3f7u60  vote.3  vote     instavote/vote  Running 11 seconds      Running        node-03
+ID                         NAME    IMAGE           NODE     DESIRED STATE  CURRENT STATE           ERROR
+1b5ebv79wqthx2wb8rsuu2srb  vote.1  instavote/vote  node-01  Running        Running 56 seconds ago
+2zxiisw364edhwtddxlhe6lxv  vote.2  instavote/vote  node-03  Running        Running 2 seconds ago
+0fol2vb3xd53vubfs2kgqltbi  vote.3  instavote/vote  node-02  Running        Running 1 seconds ago
 ```
 
 ## Check load balancing
@@ -69,11 +69,11 @@ b7sfv3oskjjt5l21seo3f7u60  vote.3  vote     instavote/vote  Running 11 seconds  
 [bargee@node-01 ~]$ sudo pkg install ipvsadm
 [bargee@node-01 ~]$ sudo ls -l /var/run/docker/netns
 total 0
--r--r--r--    1 root     root             0 Jul  2 14:35 1-cju9mci9kf
--r--r--r--    1 root     root             0 Jul  2 14:35 29891f6354a1
--r--r--r--    1 root     root             0 Jul  2 14:41 ab8827aaaf47
+-r--r--r--    1 root     root             0 Jul 28 05:38 1-3vmnixn0sn
+-r--r--r--    1 root     root             0 Jul 28 05:38 3a7c705d0cdb
+-r--r--r--    1 root     root             0 Jul 28 05:40 933e04568f99
 [bargee@node-01 ~]$ sudo mkdir -p /var/run/netns
-[bargee@node-01 ~]$ sudo ln -s /var/run/docker/netns/29891f6354a1 /var/run/netns/lbingress
+[bargee@node-01 ~]$ sudo ln -s /var/run/docker/netns/3a7c705d0cdb /var/run/netns/lbingress
 [bargee@node-01 ~]$ sudo ip netns exec lbingress ipvsadm -L
 IP Virtual Server version 1.2.1 (size=4096)
 Prot LocalAddress:Port Scheduler Flags
@@ -103,15 +103,16 @@ $ open http://192.168.65.103:8080/
 [bargee@node-01 ~]$ docker node update --availability=drain node-03
 node-03
 [bargee@node-01 ~]$ docker node ls
-ID                           HOSTNAME  MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
-696cma420rjypkftujrpxmqs2 *  node-01   Accepted    Ready   Active        Leader
-c2zz4w65vii7g7nzj6quyi16g    node-03   Accepted    Ready   Drain
-eu4th28cf2yhpyv95ywkadpjf    node-02   Accepted    Ready   Active
+ID                           HOSTNAME  STATUS  AVAILABILITY  MANAGER STATUS
+6qn4jov5n61v23beh0lqtngbl    node-03   Ready   Drain
+8g88v2jyf49lmwbnfxfsoofp5 *  node-01   Ready   Active        Leader
+c84jsskhloiuwkf3tk35qrc7a    node-02   Ready   Active
 [bargee@node-01 ~]$ docker service tasks vote
-ID                         NAME    SERVICE  IMAGE           LAST STATE          DESIRED STATE  NODE
-6wdivw267q1s0cpqbnuve6dlr  vote.1  vote     instavote/vote  Running 15 minutes  Running        node-01
-4y0u0gsfj3hkumbov6bcjqgm0  vote.2  vote     instavote/vote  Running 14 minutes  Running        node-02
-ao5f31wriza473kz6ypt24l0h  vote.3  vote     instavote/vote  Running 25 seconds  Running        node-02
+ID                         NAME        IMAGE           NODE     DESIRED STATE  CURRENT STATE            ERROR
+1b5ebv79wqthx2wb8rsuu2srb  vote.1      instavote/vote  node-01  Running        Running 2 minutes ago
+1b4v6djht9cid9u0dtksth3r8  vote.2      instavote/vote  node-02  Running        Running 26 seconds ago
+2zxiisw364edhwtddxlhe6lxv   \_ vote.2  instavote/vote  node-03  Shutdown       Shutdown 27 seconds ago
+0fol2vb3xd53vubfs2kgqltbi  vote.3      instavote/vote  node-02  Running        Running 2 minutes ago
 ```
 
 ## Remove the service
@@ -119,7 +120,7 @@ ao5f31wriza473kz6ypt24l0h  vote.3  vote     instavote/vote  Running 25 seconds  
 ```bash
 [bargee@node-01 ~]$ docker service rm vote
 vote
-[bargee@node-01 ~]$ docker service tasks redis
+[bargee@node-01 ~]$ docker service tasks vote
 Error: No such service: vote
 [bargee@node-01 ~]$ docker service ls
 ID  NAME  REPLICAS  IMAGE  COMMAND
