@@ -11,13 +11,15 @@ end
 NUM_NODES    = 3
 BASE_IP_ADDR = "192.168.65"
 
+SWARM_SECRET = "5r27dblpjixq3wirq10qyk6bh"
+
 Vagrant.configure(2) do |config|
   config.vm.box = "ailispaw/barge"
   config.vm.box_version = ">= 2.1.4"
 
   config.vm.provision :shell do |sh|
     sh.inline = <<-EOT
-      /etc/init.d/docker restart v1.12.0-rc3
+      /etc/init.d/docker restart v1.12.0-rc4
     EOT
   end
 
@@ -28,7 +30,7 @@ Vagrant.configure(2) do |config|
 
     node.vm.provision :shell do |sh|
       sh.inline = <<-EOT
-        docker swarm init --listen-addr "#{BASE_IP_ADDR}.101:2377"
+        docker swarm init --listen-addr "#{BASE_IP_ADDR}.101:2377" --secret #{SWARM_SECRET}
       EOT
     end
   end
@@ -41,7 +43,7 @@ Vagrant.configure(2) do |config|
 
       node.vm.provision :shell do |sh|
         sh.inline = <<-EOT
-          docker swarm join "#{BASE_IP_ADDR}.101:2377"
+          docker swarm join --secret #{SWARM_SECRET} "#{BASE_IP_ADDR}.101:2377"
         EOT
       end
     end
