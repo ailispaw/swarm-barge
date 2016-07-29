@@ -12,8 +12,8 @@ It's inspired by DockerCon16 KeyNote and "What's New in Docker" session.
 ## Boot up
 
 ```bash
-$ git clone https://github.com/ailispaw/swarmkit-barge
-$ cd swarmkit-barge
+$ git clone https://github.com/ailispaw/swarm-barge
+$ cd swarm-barge
 $ make up
 ```
 
