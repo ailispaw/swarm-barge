@@ -19,7 +19,7 @@ node-02 node-03:
 		vagrant ssh-config $@ >> $(SSH_CONFIG); \
 	fi
 
-	$(eval TOKEN=$$(shell ssh -F $(SSH_CONFIG) node-01 /opt/bin/docker swarm join-token worker | awk '/--token/{print $$$$2}'))
+	$(eval TOKEN=$$(shell ssh -F $(SSH_CONFIG) node-01 /opt/bin/docker swarm join-token --quiet worker))
 
 	ssh -F $(SSH_CONFIG) $@ /opt/bin/docker swarm join --token "$(TOKEN)" "$(NODE_IP:node=node-01):2377"
 
