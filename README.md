@@ -36,7 +36,7 @@ c84jsskhloiuwkf3tk35qrc7a    node-02   Ready   Active
 ```bash
 [bargee@node-01 ~]$ docker service create --name vote -p 8080:80 instavote/vote
 cf9rqqsg8emvx2x70ifxa8jbt
-[bargee@node-01 ~]$ docker service tasks vote
+[bargee@node-01 ~]$ docker service ps vote
 ID                         NAME    IMAGE           NODE     DESIRED STATE  CURRENT STATE          ERROR
 1b5ebv79wqthx2wb8rsuu2srb  vote.1  instavote/vote  node-01  Running        Running 1 seconds ago
 [bargee@node-01 ~]$  docker ps -a
@@ -55,7 +55,7 @@ $ open http://192.168.65.101:8080/
 ```bash
 [bargee@node-01 ~]$ docker service scale vote=3
 vote scaled to 3
-[bargee@node-01 ~]$ docker service tasks vote
+[bargee@node-01 ~]$ docker service ps vote
 ID                         NAME    IMAGE           NODE     DESIRED STATE  CURRENT STATE           ERROR
 1b5ebv79wqthx2wb8rsuu2srb  vote.1  instavote/vote  node-01  Running        Running 56 seconds ago
 2zxiisw364edhwtddxlhe6lxv  vote.2  instavote/vote  node-03  Running        Running 2 seconds ago
@@ -107,7 +107,7 @@ ID                           HOSTNAME  STATUS  AVAILABILITY  MANAGER STATUS
 6qn4jov5n61v23beh0lqtngbl    node-03   Ready   Drain
 8g88v2jyf49lmwbnfxfsoofp5 *  node-01   Ready   Active        Leader
 c84jsskhloiuwkf3tk35qrc7a    node-02   Ready   Active
-[bargee@node-01 ~]$ docker service tasks vote
+[bargee@node-01 ~]$ docker service ps vote
 ID                         NAME        IMAGE           NODE     DESIRED STATE  CURRENT STATE            ERROR
 1b5ebv79wqthx2wb8rsuu2srb  vote.1      instavote/vote  node-01  Running        Running 2 minutes ago
 1b4v6djht9cid9u0dtksth3r8  vote.2      instavote/vote  node-02  Running        Running 26 seconds ago
@@ -120,7 +120,7 @@ ID                         NAME        IMAGE           NODE     DESIRED STATE  C
 ```bash
 [bargee@node-01 ~]$ docker service rm vote
 vote
-[bargee@node-01 ~]$ docker service tasks vote
+[bargee@node-01 ~]$ docker service ps vote
 Error: No such service: vote
 [bargee@node-01 ~]$ docker service ls
 ID  NAME  REPLICAS  IMAGE  COMMAND
