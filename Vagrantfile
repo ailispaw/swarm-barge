@@ -17,7 +17,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision :shell do |sh|
     sh.inline = <<-EOT
-      /etc/init.d/docker restart v1.12.0
+      /etc/init.d/docker restart v1.12.1
     EOT
   end
 
