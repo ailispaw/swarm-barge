@@ -23,7 +23,7 @@ That's it.
 
 ```bash
 $ ssh -F .ssh_config node-01
-Welcome to Barge 2.3.1, Docker version 1.12.5, build 7392c3b
+Welcome to Barge 2.3.3, Docker version 1.12.6, build 78d1802
 [bargee@node-01 ~]$ docker node ls
 ID                           HOSTNAME  STATUS  AVAILABILITY  MANAGER STATUS
 6qn4jov5n61v23beh0lqtngbl    node-03   Ready   Active
@@ -69,9 +69,9 @@ ID                         NAME    IMAGE           NODE     DESIRED STATE  CURRE
 [bargee@node-01 ~]$ sudo pkg install ipvsadm
 [bargee@node-01 ~]$ sudo ls -l /var/run/docker/netns
 total 0
--r--r--r--    1 root     root             0 Dec 16 22:58 1-34nezilel6
--r--r--r--    1 root     root             0 Dec 16 22:59 d0018fa11874
--r--r--r--    1 root     root             0 Dec 16 22:58 ingress_sbox
+-r--r--r--    1 root     root             0 Jan 11 03:23 1-b0yjt1egbt
+-r--r--r--    1 root     root             0 Jan 11 03:24 a24368777148
+-r--r--r--    1 root     root             0 Jan 11 03:23 ingress_sbox
 [bargee@node-01 ~]$ sudo mkdir -p /var/run/netns
 [bargee@node-01 ~]$ sudo ln -s /var/run/docker/netns/ingress_sbox /var/run/netns/lbingress
 [bargee@node-01 ~]$ sudo ip netns exec lbingress ipvsadm -L
