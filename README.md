@@ -23,7 +23,7 @@ That's it.
 
 ```bash
 $ ssh -F .ssh_config node-01
-Welcome to Barge 2.5.7, Docker version 17.06.1-ce, build 874a737
+Welcome to Barge 2.5.7, Docker version 17.07.0-ce, build 8784753
 [bargee@node-01 ~]$ docker node ls
 ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS
 oz072u285g5fe4pcghzgz4x09     node-02             Ready               Active
@@ -55,6 +55,8 @@ $ open http://192.168.65.101:8080/
 ```bash
 [bargee@node-01 ~]$ docker service scale vote=3
 vote scaled to 3
+Since --detach=false was not specified, tasks will be scaled in the background.
+In a future release, --detach=false will become the default.
 [bargee@node-01 ~]$ docker service ps vote
 ID                  NAME                IMAGE                   NODE                DESIRED STATE       CURRENT STATE           ERROR               PORTS
 2fznq4mbkzu2        vote.1              instavote/vote:latest   node-01             Running             Running 3 minutes ago
