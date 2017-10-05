@@ -13,11 +13,11 @@ BASE_IP_ADDR = "192.168.65"
 
 Vagrant.configure(2) do |config|
   config.vm.box = "ailispaw/barge"
-  config.vm.box_version = ">= 2.1.4"
+  config.vm.box_version = ">= 2.6.1"
 
   config.vm.provision :shell do |sh|
     sh.inline = <<-EOT
-      /etc/init.d/docker restart v17.07.0-ce
+      /etc/init.d/docker restart v17.09.0-ce
     EOT
   end
 
