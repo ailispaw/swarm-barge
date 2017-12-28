@@ -23,7 +23,7 @@ That's it.
 
 ```bash
 $ ssh -F .ssh_config node-01
-Welcome to Barge 2.6.2, Docker version 17.11.0-ce, build 1caf76c
+Welcome to Barge 2.7.2, Docker version 17.12.0-ce, build c97c6d6
 [bargee@node-01 ~]$ docker node ls
 ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS
 h7edyaxyecsgfknmemxfs2nfg *   node-01             Ready               Active              Leader
